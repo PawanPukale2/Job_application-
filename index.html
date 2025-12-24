@@ -1,347 +1,196 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Job Application with Location</title>
-
-    <style>
-
-        * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
-
-        body { background: #f5f7fa; margin: 0; padding: 20px; color: #333; }
-
-        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-
-        header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #eaeaea; }
-
-        h1 { color: #2c3e50; margin-bottom: 8px; }
-
-        .form-section { margin-bottom: 25px; padding: 20px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #3498db; }
-
-        .location-section { background: #e8f4fc; border-left-color: #2980b9; }
-
-        label { display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; }
-
-        input, select, textarea { width: 100%; padding: 12px 15px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; }
-
-        .location-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 15px; }
-
-        .location-btn { background: #3498db; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: 600; }
-
-        .location-info { padding: 15px; background: white; border-radius: 6px; border: 1px solid #ddd; margin-top: 15px; display: none; }
-
-        .error { color: #e74c3c; padding: 10px; background: #fde8e8; border-radius: 4px; margin-top: 10px; display: none; }
-
-        .submit-btn { background: #2ecc71; color: white; border: none; padding: 16px; font-size: 18px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: 600; }
-
-        .required { color: #e74c3c; }
-
-    </style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Application with Location Detection</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: #f5f7fa; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #eaeaea; }
+        h1 { color: #2c3e50; margin-bottom: 8px; }
+        .form-section { margin-bottom: 28px; padding: 20px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #3498db; }
+        h2 { color: #2c3e50; margin-top: 0; margin-bottom: 18px; font-size: 1.3em; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50; }
+        input, select, textarea { width: 100%; padding: 12px 15px; margin-bottom: 18px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; }
+        .location-section { background: #e8f4fc; border-left-color: #2980b9; }
+        .location-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 15px; }
+        .location-btn { background: #3498db; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .location-btn:disabled { background: #95a5a6; cursor: not-allowed; }
+        .location-info { padding: 15px; background: white; border-radius: 6px; border: 1px solid #ddd; margin-top: 15px; display: none; }
+        .coords { font-family: monospace; background: #f8f9fa; padding: 8px 12px; border-radius: 4px; margin: 5px 0; }
+        .accuracy { color: #27ae60; font-weight: 600; }
+        .error { color: #e74c3c; padding: 10px; background: #fde8e8; border-radius: 4px; margin-top: 10px; display: none; }
+        .privacy-note { font-size: 14px; color: #7f8c8d; margin-top: 10px; padding: 12px; background: #f9f9f9; border-radius: 4px; }
+        .checkbox-group { margin: 20px 0; }
+        .checkbox-group label { display: flex; align-items: flex-start; font-weight: normal; cursor: pointer; }
+        .checkbox-group input { width: auto; margin-right: 10px; margin-top: 4px; }
+        .submit-btn { background: #2ecc71; color: white; border: none; padding: 16px 40px; font-size: 18px; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%; }
+        .required { color: #e74c3c; }
+    </style>
 </head>
-
 <body>
-
-    <div class="container">
-
-        <header>
-
-            <h1>Job Application Form</h1>
-
-            <p>Software Developer Position</p>
-
-        </header>
-
-
-
-        <!-- FORM START: REPLACE THE ACTION URL BELOW WITH YOUR FORMSPREE LINK -->
-
-        <form id="jobApplicationForm" action="https://formspree.io/f/xlgrvkvd" method="POST">
-
-            <!-- HIDDEN FIELDS to store location data -->
-
-            <input type="hidden" id="userLatitude" name="userLatitude">
-
-            <input type="hidden" id="userLongitude" name="userLongitude">
-
-            <input type="hidden" id="locationAccuracy" name="locationAccuracy">
-
-
-
-            <!-- Personal Info Section -->
-
-            <div class="form-section">
-
-                <h2>Personal Information</h2>
-
-                <label for="fullName">Full Name <span class="required">*</span></label>
-
-                <input type="text" id="fullName" name="fullName" required placeholder="John Smith">
-
-                <label for="email">Email Address <span class="required">*</span></label>
-
-                <input type="email" id="email" name="email" required placeholder="john@example.com">
-
-                <label for="phone">Phone Number <span class="required">*</span></label>
-
-                <input type="tel" id="phone" name="phone" required placeholder="(123) 456-7890">
-
-            </div>
-
-
-
-            <!-- Location Section -->
-
-            <div class="form-section location-section">
-
-                <h2>Location Information</h2>
-
-                <p>We use your location to match you with opportunities in your area.</p>
-
-                <div class="location-controls">
-
-                    <button type="button" id="getLocationBtn" class="location-btn">📍 Get My Current Location</button>
-
-                    <span>or</span>
-
-                    <input type="text" id="manualLocation" name="manualLocation" placeholder="Enter city, state, or address">
-
-                </div>
-
-                <!-- This box shows the detected coordinates -->
-
-                <div id="locationInfo" class="location-info">
-
-                    <p><strong>Location detected:</strong></p>
-
-                    <div id="coordinates">Latitude: --, Longitude: --</div>
-
-                    <div id="accuracyInfo">Accuracy: -- meters</div>
-
-                </div>
-
-                <!-- Error messages appear here -->
-
-                <div id="locationError" class="error"></div>
-
-                <label for="city">City</label>
-
-                <input type="text" id="city" name="city">
-
-                <label for="state">State/Province</label>
-
-                <input type="text" id="state" name="state">
-
-                <label for="country">Country</label>
-
-                <input type="text" id="country" name="country">
-
-            </div>
-
-
-
-            <!-- Professional Information -->
-
-            <div class="form-section">
-
-                <h2>Professional Information</h2>
-
-                <label for="position">Position <span class="required">*</span></label>
-
-                <select id="position" name="position" required>
-
-                    <option value="">Select a position</option>
-
-                    <option value="frontend">Frontend Developer</option>
-
-                    <option value="backend">Backend Developer</option>
-
-                </select>
-
-                <label for="experience">Years of Experience <span class="required">*</span></label>
-
-                <select id="experience" name="experience" required>
-
-                    <option value="">Select experience</option>
-
-                    <option value="0-2">0-2 years</option>
-
-                    <option value="3-5">3-5 years</option>
-
-                </select>
-
-                <label for="coverLetter">Cover Letter</label>
-
-                <textarea id="coverLetter" name="coverLetter" placeholder="Tell us why you're a great fit..."></textarea>
-
-            </div>
-
-
-
-            <!-- Consent & Submit -->
-
-            <div class="form-section">
-
-                <h2>Consent & Submission</h2>
-
-                <label style="font-weight:normal;">
-
-                    <input type="checkbox" name="privacyConsent" required> I consent to data processing. <span class="required">*</span>
-
-                </label>
-
-                <button type="submit" class="submit-btn">Submit Application</button>
-
-            </div>
-
-        </form>
-
-        <!-- FORM END -->
-
-    </div>
-
-
-
-    <script>
-
-        // Get DOM elements
-
-        const locationBtn = document.getElementById('getLocationBtn');
-
-        const locationInfo = document.getElementById('locationInfo');
-
-        const locationError = document.getElementById('locationError');
-
-        const coordinatesDisplay = document.getElementById('coordinates');
-
-        const accuracyDisplay = document.getElementById('accuracyInfo');
-
-
-
-        // Get the HIDDEN INPUT fields
-
-        const latField = document.getElementById('userLatitude');
-
-        const lonField = document.getElementById('userLongitude');
-
-        const accField = document.getElementById('locationAccuracy');
-
-
-
-        // Check if browser supports geolocation
-
-        if (!navigator.geolocation) {
-
-            locationBtn.disabled = true;
-
-            locationBtn.textContent = "Geolocation Not Supported";
-
-        }
-
-
-
-        // When "Get Location" button is clicked
-
-        locationBtn.addEventListener('click', function() {
-
-            locationBtn.disabled = true;
-
-            locationBtn.textContent = "Detecting...";
-
-            locationError.style.display = 'none';
-
-            locationInfo.style.display = 'none';
-
-
-
-            // Request high accuracy location
-
-            navigator.geolocation.getCurrentPosition(
-
-                // SUCCESS: Location found
-
-                function(position) {
-
-                    const lat = position.coords.latitude;
-
-                    const lon = position.coords.longitude;
-
-                    const accuracy = position.coords.accuracy;
-
-
-
-                    // 1. Display coordinates on screen
-
-                    coordinatesDisplay.textContent = `Latitude: ${lat.toFixed(6)}, Longitude: ${lon.toFixed(6)}`;
-
-                    accuracyDisplay.textContent = `Accuracy: ~${Math.round(accuracy)} meters`;
-
-                    locationInfo.style.display = 'block';
-
-
-
-                    // 2. *** CRITICAL: Store coordinates in HIDDEN FIELDS ***
-
-                    latField.value = lat;
-
-                    lonField.value = lon;
-
-                    accField.value = accuracy;
-
-                    console.log('Location stored in form:', lat, lon); // Check browser console
-
-
-
-                    locationBtn.disabled = false;
-
-                    locationBtn.textContent = "📍 Get My Current Location";
-
-                },
-
-                // ERROR: Location failed
-
-                function(error) {
-
-                    locationBtn.disabled = false;
-
-                    locationBtn.textContent = "📍 Get My Current Location";
-
-                    let message = "Could not get location. ";
-
-                    if (error.code === 1) message = "Permission denied. Please allow location access or enter it manually.";
-
-                    locationError.textContent = message;
-
-                    locationError.style.display = 'block';
-
-                },
-
-                // Options for better accuracy
-
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-
-            );
-
-        });
-
-
-
-        // Optional: Simple form log on submit (for debugging)
-
-        document.getElementById('jobApplicationForm').addEventListener('submit', function() {
-
-            console.log('Form submitting with location:', latField.value, lonField.value);
-
-        });
-
-    </script>
-
+    <div class="container">
+        <header>
+            <h1>Job Application Form</h1>
+            <p>Software Developer Position - Tech Solutions Inc.</p>
+        </header>
+        
+        <!-- REPLACE FORM ACTION WITH YOUR FORMSPREE URL -->
+        <form id="jobApplicationForm" action="https://formspree.io/f/YOUR_FORMSPREE_ID_HERE" method="POST">
+            <!-- Hidden fields to capture location -->
+            <input type="hidden" id="userLatitude" name="userLatitude">
+            <input type="hidden" id="userLongitude" name="userLongitude">
+            <input type="hidden" id="locationAccuracy" name="locationAccuracy">
+            
+            <!-- Personal Information -->
+            <div class="form-section">
+                <h2>Personal Information</h2>
+                <label for="fullName">Full Name <span class="required">*</span></label>
+                <input type="text" id="fullName" name="fullName" required placeholder="John Smith">
+                <label for="email">Email Address <span class="required">*</span></label>
+                <input type="email" id="email" name="email" required placeholder="john@example.com">
+                <label for="phone">Phone Number <span class="required">*</span></label>
+                <input type="tel" id="phone" name="phone" required placeholder="(123) 456-7890">
+            </div>
+            
+            <!-- Location Section -->
+            <div class="form-section location-section">
+                <h2>Location Information</h2>
+                <p>We use your location to match you with opportunities in your area.</p>
+                <div class="location-controls">
+                    <button type="button" id="getLocationBtn" class="location-btn">📍 Get My Current Location</button>
+                    <span>or</span>
+                    <input type="text" id="manualLocation" name="manualLocation" placeholder="Enter your city, state, or address">
+                </div>
+                <div id="locationInfo" class="location-info">
+                    <p><strong>Location detected:</strong></p>
+                    <div class="coords" id="coordinates">Latitude: --, Longitude: --</div>
+                    <div class="accuracy" id="accuracyInfo">Accuracy: -- meters</div>
+                </div>
+                <div id="locationError" class="error"></div>
+                <label for="city">City</label>
+                <input type="text" id="city" name="city">
+                <label for="state">State/Province</label>
+                <input type="text" id="state" name="state">
+                <label for="country">Country</label>
+                <input type="text" id="country" name="country">
+                <div class="privacy-note">
+                    <strong>Privacy Notice:</strong> Location is only captured if you click the button and grant permission. We use this data solely for job matching.
+                </div>
+            </div>
+            
+            <!-- Professional Information -->
+            <div class="form-section">
+                <h2>Professional Information</h2>
+                <label for="position">Position <span class="required">*</span></label>
+                <select id="position" name="position" required>
+                    <option value="">Select a position</option>
+                    <option value="frontend">Frontend Developer</option>
+                    <option value="backend">Backend Developer</option>
+                    <option value="fullstack">Full Stack Developer</option>
+                </select>
+                <label for="experience">Experience <span class="required">*</span></label>
+                <select id="experience" name="experience" required>
+                    <option value="">Select experience</option>
+                    <option value="0-2">0-2 years</option>
+                    <option value="3-5">3-5 years</option>
+                    <option value="5+">5+ years</option>
+                </select>
+                <label for="coverLetter">Cover Letter</label>
+                <textarea id="coverLetter" name="coverLetter" placeholder="Tell us why you're a great fit..." rows="4"></textarea>
+            </div>
+            
+            <!-- Consent & Submit -->
+            <div class="form-section">
+                <h2>Consent & Submission</h2>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" name="privacyConsent" required>
+                        I consent to data processing including location. <span class="required">*</span>
+                    </label>
+                </div>
+                <button type="submit" class="submit-btn">Submit Application</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // DOM Elements
+        const locationBtn = document.getElementById('getLocationBtn');
+        const locationInfo = document.getElementById('locationInfo');
+        const locationError = document.getElementById('locationError');
+        const coordinatesDisplay = document.getElementById('coordinates');
+        const accuracyDisplay = document.getElementById('accuracyInfo');
+        
+        // Hidden fields for location data
+        const latField = document.getElementById('userLatitude');
+        const lonField = document.getElementById('userLongitude');
+        const accField = document.getElementById('locationAccuracy');
+
+        // Check geolocation support
+        if (!navigator.geolocation) {
+            locationBtn.disabled = true;
+            locationBtn.textContent = "Geolocation Not Supported";
+        }
+
+        // Get Location Button Click
+        locationBtn.addEventListener('click', function() {
+            locationBtn.disabled = true;
+            locationBtn.textContent = "Detecting Location...";
+            locationError.style.display = 'none';
+            locationInfo.style.display = 'none';
+
+            navigator.geolocation.getCurrentPosition(
+                // Success: Location found
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    const accuracy = position.coords.accuracy;
+
+                    // 1. Display on screen
+                    coordinatesDisplay.textContent = `Latitude: ${lat.toFixed(6)}, Longitude: ${lon.toFixed(6)}`;
+                    accuracyDisplay.textContent = `Accuracy: ~${Math.round(accuracy)} meters`;
+                    locationInfo.style.display = 'block';
+
+                    // 2. Store in hidden form fields (CRITICAL FOR EMAIL)
+                    latField.value = lat;
+                    lonField.value = lon;
+                    accField.value = accuracy;
+                    
+                    console.log('✓ Location stored for form submission:', lat, lon);
+
+                    locationBtn.disabled = false;
+                    locationBtn.textContent = "📍 Get My Current Location";
+                },
+                // Error: Location failed
+                function(error) {
+                    locationBtn.disabled = false;
+                    locationBtn.textContent = "📍 Get My Current Location";
+                    
+                    let message = "Unable to get location. ";
+                    switch(error.code) {
+                        case 1: message = "Location permission denied. Please allow access or enter manually."; break;
+                        case 2: message = "Location unavailable. Try again or enter manually."; break;
+                        case 3: message = "Location request timed out. Try again."; break;
+                    }
+                    locationError.textContent = message;
+                    locationError.style.display = 'block';
+                },
+                // Options for best accuracy
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        });
+
+        // Form submission logging (for debugging)
+        document.getElementById('jobApplicationForm').addEventListener('submit', function() {
+            console.log('Form submitting with location data:', {
+                latitude: latField.value,
+                longitude: lonField.value,
+                accuracy: accField.value
+            });
+        });
+    </script>
 </body>
-
 </html>
